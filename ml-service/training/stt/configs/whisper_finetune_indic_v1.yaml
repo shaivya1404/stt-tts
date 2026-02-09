@@ -1,0 +1,68 @@
+# Whisper Fine-tuning Configuration for Indic Languages
+# Optimized for Colab T4 GPU with LoRA
+
+model_name: whisper_indic_medium
+version: v1
+base_model: openai/whisper-medium
+sample_rate: 16000
+
+# Supported languages (English + Hindi focus)
+languages:
+  - en     # English
+  - hi     # Hindi
+
+# Data configuration
+train_manifest: data/stt/train_manifest.jsonl
+val_manifest: data/stt/val_manifest.jsonl
+text_column: text
+audio_column: audio_filepath
+
+# Training configuration
+training:
+  # Basic training params
+  epochs: 5
+  batch_size: 4
+  learning_rate: 1.0e-5
+  warmup_steps: 500
+  max_steps: 10000
+  gradient_accumulation_steps: 4
+  gradient_checkpointing: true
+
+  # Precision settings (optimized for T4)
+  fp16: true
+  bf16: false
+
+  # LoRA configuration (parameter-efficient fine-tuning)
+  use_lora: true
+  lora:
+    r: 32                    # LoRA rank
+    alpha: 64                # LoRA alpha (scaling factor)
+    dropout: 0.1             # LoRA dropout
+    target_modules:          # Modules to apply LoRA to
+      - q_proj
+      - v_proj
+      - k_proj
+      - out_proj
+      - fc1
+      - fc2
+    use_8bit: false
+    use_4bit: false
+
+  # Logging and evaluation
+  log_every_n_steps: 50
+  eval_steps: 500
+
+# Output configuration
+output:
+  base_dir: ${MODEL_BASE_PATH:-/models}
+  save_every_n_steps: 1000
+  push_to_hub: false
+  hub_model_id: null
+
+# Evaluation settings
+evaluation:
+  metrics:
+    - wer    # Word Error Rate
+    - cer    # Character Error Rate
+  beam_size: 5
+  max_length: 225

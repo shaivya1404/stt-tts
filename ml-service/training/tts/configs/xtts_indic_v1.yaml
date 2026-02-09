@@ -1,0 +1,69 @@
+# XTTS v2 Fine-tuning Configuration for Indic Languages
+# Optimized for Colab T4 GPU (16GB VRAM)
+
+model_name: xtts_indic
+version: v1
+base_model: tts_models/multilingual/multi-dataset/xtts_v2
+
+# Audio settings
+sample_rate: 22050
+max_audio_length: 11.0  # seconds (XTTS limit)
+min_audio_length: 1.0   # seconds
+
+# Supported languages (English + Hindi focus)
+languages:
+  - en     # English (native)
+  - hi     # Hindi
+
+# Data configuration
+train_manifest: data/tts/train_manifest.jsonl
+val_manifest: data/tts/val_manifest.jsonl
+
+# Training configuration
+training:
+  # Batch size (keep small for T4)
+  batch_size: 2
+
+  # Gradient accumulation to simulate larger batch
+  gradient_accumulation: 8
+
+  # Learning rate (small for fine-tuning)
+  learning_rate: 1e-5
+
+  # Number of epochs
+  epochs: 100
+
+  # Mixed precision (fp16 for T4)
+  mixed_precision: fp16
+
+  # Layers to freeze (optional - freeze early layers)
+  freeze_layers: []
+  # Example to freeze encoder:
+  # freeze_layers:
+  #   - "gpt.wte"
+  #   - "gpt.wpe"
+
+  # Logging
+  log_every_n_steps: 10
+
+  # Evaluation
+  eval_every_n_steps: 500
+
+# Output configuration
+output_dir: outputs/xtts_indic_v1
+save_every_n_steps: 1000
+
+# Voice cloning settings
+voice_cloning:
+  # Minimum reference audio length for cloning
+  min_reference_length: 3.0
+  # Maximum reference audio length
+  max_reference_length: 30.0
+  # Number of reference samples to average
+  num_reference_samples: 3
+
+# Quality targets
+targets:
+  mos_score: 3.5
+  speaker_similarity: 0.85
+  realtime_factor: 0.5

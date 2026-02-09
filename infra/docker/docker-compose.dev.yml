@@ -1,0 +1,85 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tts_stt
+      POSTGRES_PASSWORD: tts_stt_password
+      POSTGRES_DB: tts_stt
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+
+  tts-service:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.tts
+    environment:
+      ENVIRONMENT: development
+      LOG_LEVEL: INFO
+    ports:
+      - '8001:8001'
+    depends_on:
+      - redis
+
+  stt-service:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.stt
+    environment:
+      ENVIRONMENT: development
+      LOG_LEVEL: INFO
+    ports:
+      - '8002:8002'
+    depends_on:
+      - redis
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.backend
+    environment:
+      NODE_ENV: development
+      BACKEND_PORT: 4000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: tts_stt
+      POSTGRES_PASSWORD: tts_stt_password
+      POSTGRES_DB: tts_stt
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      TTS_SERVICE_URL: http://tts-service:8001
+      STT_SERVICE_URL: http://stt-service:8002
+    ports:
+      - '4000:4000'
+    depends_on:
+      - postgres
+      - redis
+      - tts-service
+      - stt-service
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.frontend
+    environment:
+      VITE_API_BASE_URL: http://backend:4000/api/v1
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
+  redis-data:

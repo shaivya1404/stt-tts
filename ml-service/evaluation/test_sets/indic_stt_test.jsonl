@@ -1,0 +1,7 @@
+{"audio_filepath": "test_audio/hi_001.wav", "text": "नमस्ते आप कैसे हैं", "language": "hi-IN", "duration": 2.5}
+{"audio_filepath": "test_audio/hi_002.wav", "text": "आज मौसम बहुत अच्छा है", "language": "hi-IN", "duration": 3.0}
+{"audio_filepath": "test_audio/hi_003.wav", "text": "मुझे हिंदी में बात करना पसंद है", "language": "hi-IN", "duration": 3.5}
+{"audio_filepath": "test_audio/ta_001.wav", "text": "வணக்கம் நீங்கள் எப்படி இருக்கிறீர்கள்", "language": "ta-IN", "duration": 3.0}
+{"audio_filepath": "test_audio/ta_002.wav", "text": "இன்று வானிலை மிகவும் நன்றாக உள்ளது", "language": "ta-IN", "duration": 3.5}
+{"audio_filepath": "test_audio/te_001.wav", "text": "నమస్కారం మీరు ఎలా ఉన్నారు", "language": "te-IN", "duration": 2.5}
+{"audio_filepath": "test_audio/bn_001.wav", "text": "নমস্কার আপনি কেমন আছেন", "language": "bn-IN", "duration": 2.5}

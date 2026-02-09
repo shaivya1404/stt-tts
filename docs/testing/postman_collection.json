@@ -1,0 +1,563 @@
+{
+  "info": {
+    "name": "TTS-STT ML Services",
+    "description": "Complete API collection for TTS (Text-to-Speech) and STT (Speech-to-Text) ML services.\n\n## Setup Instructions\n\n1. Import this collection into Postman\n2. Create an environment with these variables:\n   - `STT_URL`: Your STT service ngrok URL\n   - `TTS_URL`: Your TTS service ngrok URL\n3. Update the environment variables with your actual URLs\n4. Run the requests!\n\n## Services\n\n- **STT Service**: Faster-Whisper large-v3 for speech transcription\n- **TTS Service**: XTTS v2 (Coqui TTS) for speech synthesis",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "tts-stt-services"
+  },
+  "item": [
+    {
+      "name": "STT Service",
+      "description": "Speech-to-Text service endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{STT_URL}}/ml/stt/health",
+              "host": ["{{STT_URL}}"],
+              "path": ["ml", "stt", "health"]
+            },
+            "description": "Check if STT service is healthy and models are loaded."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{STT_URL}}/ml/stt/health",
+                  "host": ["{{STT_URL}}"],
+                  "path": ["ml", "stt", "health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"ok\",\n  \"detail\": \"stt-service healthy\",\n  \"models\": [\n    {\n      \"name\": \"whisper_large-v3\",\n      \"type\": \"stt\",\n      \"version\": \"v1\",\n      \"status\": \"ready\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{STT_URL}}/ml/stt/models",
+              "host": ["{{STT_URL}}"],
+              "path": ["ml", "stt", "models"]
+            },
+            "description": "List all loaded STT models."
+          },
+          "response": []
+        },
+        {
+          "name": "Transcribe Audio (English)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Audio file (WAV, MP3, FLAC, OGG, M4A)"
+                },
+                {
+                  "key": "language_hint",
+                  "value": "en",
+                  "type": "text",
+                  "description": "Language hint (en, hi, ta, te, etc.)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{STT_URL}}/ml/stt/transcribe",
+              "host": ["{{STT_URL}}"],
+              "path": ["ml", "stt", "transcribe"]
+            },
+            "description": "Transcribe an audio file to text.\n\n**Supported Formats:** WAV, MP3, FLAC, OGG, M4A, WebM\n\n**Language Hints:** en, hi, ta, te, bn, mr, gu, kn, ml, pa, es, fr, de, zh, ja, ko, ar, ru"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{STT_URL}}/ml/stt/transcribe",
+                  "host": ["{{STT_URL}}"],
+                  "path": ["ml", "stt", "transcribe"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"text\": \"Hello, this is a test of the speech to text system.\",\n  \"language\": \"en\",\n  \"confidence\": 0.94,\n  \"timestamps\": [\n    {\"start\": 0.0, \"end\": 0.48, \"word\": \"Hello\"},\n    {\"start\": 0.48, \"end\": 0.72, \"word\": \"this\"},\n    {\"start\": 0.72, \"end\": 0.88, \"word\": \"is\"}\n  ],\n  \"meta\": {\n    \"duration_seconds\": 3.5,\n    \"quality_score\": 0.92,\n    \"model_name\": \"whisper_large-v3\"\n  },\n  \"modelUsed\": \"whisper_large-v3:primary\",\n  \"status\": \"success\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Transcribe Audio (Hindi)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Hindi audio file"
+                },
+                {
+                  "key": "language_hint",
+                  "value": "hi",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{STT_URL}}/ml/stt/transcribe",
+              "host": ["{{STT_URL}}"],
+              "path": ["ml", "stt", "transcribe"]
+            },
+            "description": "Transcribe Hindi audio to text."
+          },
+          "response": []
+        },
+        {
+          "name": "Transcribe Audio (Auto-detect)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Audio file in any language"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{STT_URL}}/ml/stt/transcribe",
+              "host": ["{{STT_URL}}"],
+              "path": ["ml", "stt", "transcribe"]
+            },
+            "description": "Transcribe audio with automatic language detection."
+          },
+          "response": []
+        },
+        {
+          "name": "Initialize Models",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{STT_URL}}/ml/stt/initialize",
+              "host": ["{{STT_URL}}"],
+              "path": ["ml", "stt", "initialize"]
+            },
+            "description": "Re-initialize STT models."
+          },
+          "response": []
+        },
+        {
+          "name": "Reload Models",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{STT_URL}}/ml/stt/reload",
+              "host": ["{{STT_URL}}"],
+              "path": ["ml", "stt", "reload"]
+            },
+            "description": "Reload STT models."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TTS Service",
+      "description": "Text-to-Speech service endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/health",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "health"]
+            },
+            "description": "Check if TTS service is healthy and models are loaded."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{TTS_URL}}/ml/tts/health",
+                  "host": ["{{TTS_URL}}"],
+                  "path": ["ml", "tts", "health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"ok\",\n  \"detail\": \"tts-service healthy\",\n  \"service\": \"tts-service\",\n  \"models\": [\n    {\n      \"name\": \"xtts_v2\",\n      \"type\": \"tts\",\n      \"version\": \"v1\",\n      \"status\": \"ready\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/models",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "models"]
+            },
+            "description": "List all loaded TTS models."
+          },
+          "response": []
+        },
+        {
+          "name": "Synthesize Speech (English)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Hello, this is a test of the text to speech system.\",\n  \"language\": \"en\",\n  \"speed\": 1.0\n}"
+            },
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/predict",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "predict"]
+            },
+            "description": "Synthesize English text to speech.\n\n**Parameters:**\n- `text`: Text to synthesize (required)\n- `language`: Language code (optional, default: en)\n- `speed`: Speech speed 0.5-2.0 (optional, default: 1.0)\n- `voice_id`: Voice identifier (optional)\n- `speaker_wav`: Path to reference audio for voice cloning (optional)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{TTS_URL}}/ml/tts/predict",
+                  "host": ["{{TTS_URL}}"],
+                  "path": ["ml", "tts", "predict"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"audio_path\": \"/models/tts/xtts_v2/v1/synthesized/default_abc123.wav\",\n  \"duration\": 3.2,\n  \"status\": \"success\",\n  \"meta\": {\n    \"language\": \"en\",\n    \"speed\": 1.0,\n    \"mos_score\": 4.0,\n    \"model\": \"xtts_v2\",\n    \"char_count\": 52\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Synthesize Speech (Hindi)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"नमस्ते, यह टेक्स्ट टू स्पीच सिस्टम का परीक्षण है।\",\n  \"language\": \"hi\",\n  \"speed\": 1.0\n}"
+            },
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/predict",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "predict"]
+            },
+            "description": "Synthesize Hindi text to speech."
+          },
+          "response": []
+        },
+        {
+          "name": "Synthesize Speech (Tamil)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"வணக்கம், இது உரையிலிருந்து பேச்சு அமைப்பின் சோதனை.\",\n  \"language\": \"ta\",\n  \"speed\": 1.0\n}"
+            },
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/predict",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "predict"]
+            },
+            "description": "Synthesize Tamil text to speech."
+          },
+          "response": []
+        },
+        {
+          "name": "Synthesize Speech (Fast Speed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"This is a test with faster speech speed.\",\n  \"language\": \"en\",\n  \"speed\": 1.5\n}"
+            },
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/predict",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "predict"]
+            },
+            "description": "Synthesize speech at 1.5x speed."
+          },
+          "response": []
+        },
+        {
+          "name": "Synthesize Speech (Slow Speed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"This is a test with slower speech speed.\",\n  \"language\": \"en\",\n  \"speed\": 0.75\n}"
+            },
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/predict",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "predict"]
+            },
+            "description": "Synthesize speech at 0.75x speed."
+          },
+          "response": []
+        },
+        {
+          "name": "Synthesize Long Text",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Artificial intelligence has transformed the way we interact with technology. From voice assistants to autonomous vehicles, AI is becoming an integral part of our daily lives. Natural language processing, a subset of AI, enables machines to understand and respond to human language in meaningful ways. Text-to-speech technology is a prime example of this, converting written text into natural-sounding speech.\",\n  \"language\": \"en\",\n  \"speed\": 1.0\n}"
+            },
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/predict",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "predict"]
+            },
+            "description": "Synthesize a longer paragraph of text."
+          },
+          "response": []
+        },
+        {
+          "name": "Initialize Models",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/initialize",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "initialize"]
+            },
+            "description": "Re-initialize TTS models."
+          },
+          "response": []
+        },
+        {
+          "name": "Reload Models",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ngrok-skip-browser-warning",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{TTS_URL}}/ml/tts/reload",
+              "host": ["{{TTS_URL}}"],
+              "path": ["ml", "tts", "reload"]
+            },
+            "description": "Reload TTS models."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Add ngrok header to skip browser warning",
+          "pm.request.headers.add({",
+          "    key: 'ngrok-skip-browser-warning',",
+          "    value: 'true'",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Basic test for all requests",
+          "pm.test('Status code is 200', function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test('Response time is less than 120s', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(120000);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "STT_URL",
+      "value": "https://your-stt-url.ngrok-free.app",
+      "type": "string"
+    },
+    {
+      "key": "TTS_URL",
+      "value": "https://your-tts-url.ngrok-free.app",
+      "type": "string"
+    }
+  ]
+}

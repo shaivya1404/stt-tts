@@ -1,0 +1,22 @@
+model_name: vits_multispkr_indic
+version: v1
+sample_rate: 22050
+n_speakers: 64
+languages:
+  - en-IN
+  - hi-IN
+  - ta-IN
+train_manifest: data/indic_tts_train.jsonl
+val_manifest: data/indic_tts_val.jsonl
+optimizer:
+  name: adamw
+  learning_rate: 0.0002
+  weight_decay: 0.01
+training:
+  epochs: 3
+  batch_size: 4
+  steps_per_epoch: 50
+  log_every_n_steps: 5
+  checkpoint_interval: 25
+output:
+  base_path: "${MODEL_BASE_PATH}/tts"

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-service
+  labels:
+    app: tts-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-service
+  template:
+    metadata:
+      labels:
+        app: tts-service
+    spec:
+      containers:
+        - name: tts-service
+          image: tts-service:latest # replace with registry image
+          ports:
+            - containerPort: 8001
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-service
+spec:
+  selector:
+    app: tts-service
+  ports:
+    - name: http
+      port: 8001
+      targetPort: 8001
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stt-service
+  labels:
+    app: stt-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stt-service
+  template:
+    metadata:
+      labels:
+        app: stt-service
+    spec:
+      containers:
+        - name: stt-service
+          image: stt-service:latest # replace with registry image
+          ports:
+            - containerPort: 8002
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stt-service
+spec:
+  selector:
+    app: stt-service
+  ports:
+    - name: http
+      port: 8002
+      targetPort: 8002
+  type: ClusterIP

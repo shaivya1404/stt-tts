@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(if not exist datasttyoutube mkdir datasttyoutube)",
+      "Bash(if not exist datasttmovies mkdir datasttmovies)",
+      "Bash(if not exist datasttpublic mkdir datasttpublic)",
+      "Bash(pip install:*)",
+      "Bash(C:/Users/DELL/AppData/Roaming/Python/Python313/Scripts/yt-dlp.exe:*)",
+      "Bash(where:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(python ml-service/data/youtube_extractor.py:*)",
+      "Bash(python ml-service/data/simple_extract.py:*)",
+      "Bash(python ml-service/data/transcribe_segments.py:*)",
+      "Bash(find:*)",
+      "Bash(python:*)",
+      "Bash(dir:*)"
+    ]
+  }
+}

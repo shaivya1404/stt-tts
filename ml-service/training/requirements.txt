@@ -1,0 +1,44 @@
+# Training Requirements for TTS and STT Models
+# Install with: pip install -r requirements.txt
+
+# Core ML
+torch>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+soundfile>=0.12.0
+librosa>=0.10.0
+
+# Transformers & Training
+transformers>=4.36.0
+datasets>=2.16.0
+accelerate>=0.24.0
+peft>=0.5.0
+
+# TTS Training (XTTS)
+TTS>=0.22.0
+
+# STT Training (Whisper)
+openai-whisper>=20231117
+
+# Evaluation
+jiwer>=3.0.0
+speechmos>=0.1.0
+resemblyzer>=0.1.0
+
+# Indic Language Support
+indic-nlp-library>=0.81
+aksharamukha>=2.0.0
+
+# Audio Processing
+deepfilternet>=0.5.0
+deepmultilingualpunctuation>=1.0.0
+
+# Utilities
+loguru>=0.7.2
+tqdm>=4.66.0
+pyyaml>=6.0.0
+pandas>=2.0.0
+
+# Colab/Jupyter
+ipywidgets>=8.0.0
+matplotlib>=3.7.0

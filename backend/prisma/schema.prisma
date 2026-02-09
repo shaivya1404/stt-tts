@@ -1,0 +1,228 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  owner
+  admin
+  developer
+  viewer
+}
+
+enum VoiceProfileStatus {
+  active
+  training
+  disabled
+}
+
+enum AudioFileType {
+  tts_output
+  stt_input
+  stt_output
+  voice_clone_sample
+}
+
+enum JobStatus {
+  queued
+  processing
+  completed
+  failed
+}
+
+enum MlModelType {
+  tts
+  stt
+}
+
+enum MlModelStatus {
+  active
+  deprecated
+  loading
+  error
+}
+
+enum UsageType {
+  tts
+  stt
+}
+
+model Organization {
+  id             String         @id @default(uuid()) @map("id")
+  name           String         @map("name")
+  slug           String         @unique @map("slug")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  users          User[]
+  apiKeys        ApiKey[]
+  voiceProfiles  VoiceProfile[]
+  audioFiles     AudioFile[]
+  ttsJobs        TtsJob[]
+  sttJobs        SttJob[]
+  usageRecords   UsageRecord[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String       @id @default(uuid()) @map("id")
+  orgId          String       @map("org_id")
+  email          String       @map("email")
+  passwordHash   String       @map("password_hash")
+  role           UserRole     @default(developer) @map("role")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  ttsJobs        TtsJob[]
+  sttJobs        SttJob[]
+  audioFiles     AudioFile[]
+
+  @@unique([orgId, email])
+  @@map("users")
+}
+
+model ApiKey {
+  id                  String       @id @default(uuid()) @map("id")
+  orgId               String       @map("org_id")
+  keyHash             String       @unique @map("key_hash")
+  name                String       @map("name")
+  scopes              String[]     @default([]) @map("scopes")
+  rateLimitPerMinute  Int?         @map("rate_limit_per_minute")
+  createdAt           DateTime     @default(now()) @map("created_at")
+  lastUsedAt          DateTime?    @map("last_used_at")
+  revokedAt           DateTime?    @map("revoked_at")
+  organization        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  ttsJobs             TtsJob[]
+  sttJobs             SttJob[]
+  usageRecords        UsageRecord[]
+
+  @@map("api_keys")
+}
+
+model VoiceProfile {
+  id                    String             @id @default(uuid()) @map("id")
+  orgId                 String             @map("org_id")
+  name                  String             @map("name")
+  language              String             @map("language")
+  gender                String?            @map("gender")
+  description           String?            @map("description")
+  baseModel             String             @map("base_model")
+  speakerEmbeddingPath  String?            @map("speaker_embedding_path")
+  status                VoiceProfileStatus @default(training) @map("status")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+  organization          Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  ttsJobs               TtsJob[]
+
+  @@map("voice_profiles")
+}
+
+model AudioFile {
+  id              String        @id @default(uuid()) @map("id")
+  orgId           String        @map("org_id")
+  userId          String?       @map("user_id")
+  type            AudioFileType @map("type")
+  storagePath     String        @map("storage_path")
+  mimeType        String        @map("mime_type")
+  durationSeconds Float?        @map("duration_seconds")
+  sizeBytes       Int?          @map("size_bytes")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  organization    Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user            User?         @relation(fields: [userId], references: [id])
+  ttsResultJobs   TtsJob[]      @relation("TtsJobResultAudio")
+  sttInputJobs    SttJob[]      @relation("SttJobInputAudio")
+
+  @@map("audio_files")
+}
+
+model TtsJob {
+  id                 String       @id @default(uuid()) @map("id")
+  orgId              String       @map("org_id")
+  userId             String?      @map("user_id")
+  apiKeyId           String?      @map("api_key_id")
+  inputText          String       @map("input_text")
+  language           String       @map("language")
+  voiceProfileId     String?      @map("voice_profile_id")
+  emotion            String?      @map("emotion")
+  speed              Float?       @map("speed")
+  status             JobStatus    @default(queued) @map("status")
+  resultAudioFileId  String?      @map("result_audio_file_id")
+  errorMessage       String?      @map("error_message")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+  completedAt        DateTime?    @map("completed_at")
+  organization       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user               User?        @relation(fields: [userId], references: [id])
+  apiKey             ApiKey?      @relation(fields: [apiKeyId], references: [id])
+  voiceProfile       VoiceProfile? @relation(fields: [voiceProfileId], references: [id])
+  resultAudioFile    AudioFile?    @relation("TtsJobResultAudio", fields: [resultAudioFileId], references: [id])
+
+  @@map("tts_jobs")
+}
+
+model SttJob {
+  id               String       @id @default(uuid()) @map("id")
+  orgId            String       @map("org_id")
+  userId           String?      @map("user_id")
+  apiKeyId         String?      @map("api_key_id")
+  inputAudioFileId String       @map("input_audio_file_id")
+  languageDetected String?      @map("language_detected")
+  modelUsed        String       @map("model_used")
+  status           JobStatus    @default(queued) @map("status")
+  errorMessage     String?      @map("error_message")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  completedAt      DateTime?    @map("completed_at")
+  organization     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user             User?        @relation(fields: [userId], references: [id])
+  apiKey           ApiKey?      @relation(fields: [apiKeyId], references: [id])
+  inputAudioFile   AudioFile    @relation("SttJobInputAudio", fields: [inputAudioFileId], references: [id])
+  transcription    Transcription?
+
+  @@map("stt_jobs")
+}
+
+model Transcription {
+  id        String   @id @default(uuid()) @map("id")
+  sttJobId  String   @unique @map("stt_job_id")
+  text      String   @map("text")
+  language  String   @map("language")
+  confidence Float   @map("confidence")
+  timestamps Json    @map("timestamps")
+  createdAt DateTime @default(now()) @map("created_at")
+  sttJob    SttJob   @relation(fields: [sttJobId], references: [id], onDelete: Cascade)
+
+  @@map("transcriptions")
+}
+
+model UsageRecord {
+  id        String     @id @default(uuid()) @map("id")
+  orgId     String     @map("org_id")
+  apiKeyId  String?    @map("api_key_id")
+  type      UsageType  @map("type")
+  units     Float      @map("units")
+  metadata  Json?      @map("metadata")
+  createdAt DateTime   @default(now()) @map("created_at")
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  apiKey    ApiKey?    @relation(fields: [apiKeyId], references: [id])
+
+  @@map("usage_records")
+}
+
+model MlModel {
+  id        String        @id @default(uuid()) @map("id")
+  name      String        @map("name")
+  type      MlModelType   @map("type")
+  version   String        @map("version")
+  status    MlModelStatus @default(loading) @map("status")
+  config    Json?         @map("config")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  @@unique([name, type, version])
+  @@map("ml_models")
+}

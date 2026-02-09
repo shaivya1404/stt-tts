@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+  labels:
+    app: backend-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-api
+  template:
+    metadata:
+      labels:
+        app: backend-api
+    spec:
+      containers:
+        - name: backend-api
+          image: backend-api:latest # replace with registry image
+          ports:
+            - containerPort: 4000
+          env:
+            - name: BACKEND_PORT
+              value: "4000"
+            - name: TTS_SERVICE_URL
+              value: "http://tts-service:8001"
+            - name: STT_SERVICE_URL
+              value: "http://stt-service:8002"
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: REDIS_HOST
+              value: "redis"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-api
+spec:
+  selector:
+    app: backend-api
+  ports:
+    - name: http
+      port: 4000
+      targetPort: 4000
+  type: ClusterIP

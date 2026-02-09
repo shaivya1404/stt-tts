@@ -1,0 +1,42 @@
+# Node
+node_modules/
+dist/
+.npm/
+
+# TypeScript
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+.env.*
+
+# data files
+data/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors
+.vscode/
+.idea/
+.DS_Store
+
+# Build artifacts
+coverage/
+build/
+frontend/.vite/
+
+# Docker
+*.pid
+
+
+whisper-stt-model-29-1-2026/

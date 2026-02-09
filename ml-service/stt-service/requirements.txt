@@ -1,0 +1,28 @@
+fastapi[all]==0.110.0
+uvicorn[standard]==0.27.1
+pydantic==2.5.3
+pydantic-settings==2.1.0
+loguru==0.7.2
+python-multipart==0.0.9
+
+# ML Dependencies for Faster-Whisper STT
+faster-whisper>=1.0.0
+numpy>=1.24.0
+soundfile>=0.12.0
+librosa>=0.10.0
+torch>=2.0.0
+
+# Indic Language Support
+indic-nlp-library>=0.81
+
+# Noise Reduction
+deepfilternet>=0.5.0
+
+# Punctuation Restoration
+deepmultilingualpunctuation>=1.0.0
+
+# Training Dependencies (LoRA)
+peft>=0.5.0
+accelerate>=0.24.0
+transformers>=4.36.0
+jiwer>=3.0.0
