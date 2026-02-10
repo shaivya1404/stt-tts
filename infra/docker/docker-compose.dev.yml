@@ -69,17 +69,6 @@ services:
       - tts-service
       - stt-service
 
-  frontend:
-    build:
-      context: ../..
-      dockerfile: infra/docker/Dockerfile.frontend
-    environment:
-      VITE_API_BASE_URL: http://backend:4000/api/v1
-    ports:
-      - '5173:80'
-    depends_on:
-      - backend
-
 volumes:
   postgres-data:
   redis-data:

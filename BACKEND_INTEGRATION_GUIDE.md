@@ -256,7 +256,7 @@ const response = await axios.post(`${TTS_SERVICE_URL}/ml/tts/predict`, {
 
 ---
 
-## 6. Backend API Routes (What Frontend/App Calls)
+## 6. Backend API Routes
 
 These are the existing routes on the Node.js backend (port 4000):
 
@@ -310,7 +310,7 @@ cd tts-stt/infra/docker
 docker-compose -f docker-compose.dev.yml up
 ```
 
-This starts: postgres (5432), redis (6379), tts-service (8001), stt-service (8002), backend (4000), frontend (5173)
+This starts: postgres (5432), redis (6379), tts-service (8001), stt-service (8002), backend (4000)
 
 ### Option B: Manual
 
