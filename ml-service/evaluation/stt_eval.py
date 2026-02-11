@@ -151,6 +151,7 @@ def transcribe_audio(
     processor,
     audio_path: str,
     device: str = "cuda",
+    language: Optional[str] = None,
 ) -> Tuple[str, float, float]:
     """Transcribe audio file.
 
@@ -159,6 +160,7 @@ def transcribe_audio(
         processor: Whisper processor
         audio_path: Path to audio file
         device: Device to use
+        language: Language code (e.g. "en", "hi") for forced decoding
 
     Returns:
         Tuple of (transcription, audio_duration, processing_time)
@@ -190,9 +192,16 @@ def transcribe_audio(
     ).input_features.to(device)
 
     # Transcribe
+    generate_kwargs = {"max_length": 225}
+    if language:
+        forced_decoder_ids = processor.get_decoder_prompt_ids(
+            language=language, task="transcribe"
+        )
+        generate_kwargs["forced_decoder_ids"] = forced_decoder_ids
+
     start_time = time.time()
     with torch.no_grad():
-        predicted_ids = model.generate(input_features, max_length=225)
+        predicted_ids = model.generate(input_features, **generate_kwargs)
     processing_time = time.time() - start_time
 
     transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
@@ -206,6 +215,7 @@ def evaluate_sample(
     audio_path: str,
     reference: str,
     device: str = "cuda",
+    language: Optional[str] = None,
 ) -> STTEvalResult:
     """Evaluate a single STT sample.
 
@@ -215,12 +225,13 @@ def evaluate_sample(
         audio_path: Path to audio file
         reference: Reference transcript
         device: Device to use
+        language: Language code for forced decoding
 
     Returns:
         Evaluation result
     """
     prediction, audio_duration, processing_time = transcribe_audio(
-        model, processor, audio_path, device
+        model, processor, audio_path, device, language=language
     )
 
     wer = compute_wer(reference, prediction)
@@ -245,6 +256,7 @@ def evaluate_test_set(
     test_manifest: Path,
     device: str = "cuda",
     max_samples: Optional[int] = None,
+    language: Optional[str] = None,
 ) -> Tuple[List[STTEvalResult], STTEvalSummary]:
     """Evaluate model on test set.
 
@@ -254,11 +266,13 @@ def evaluate_test_set(
         test_manifest: Path to test manifest JSONL
         device: Device to use
         max_samples: Maximum number of samples to evaluate
+        language: Language code for forced decoding
 
     Returns:
         Tuple of (results list, summary)
     """
     results = []
+    manifest_dir = test_manifest.parent
 
     with open(test_manifest, "r", encoding="utf-8") as f:
         samples = [json.loads(line) for line in f if line.strip()]
@@ -269,14 +283,14 @@ def evaluate_test_set(
     logger.info(f"Evaluating {len(samples)} samples...")
 
     for idx, sample in enumerate(samples):
-        audio_path = sample.get("audio_filepath", "")
+        audio_path = str(manifest_dir / sample.get("audio_filepath", ""))
         reference = sample.get("text", "")
 
         if not audio_path or not reference:
             continue
 
         try:
-            result = evaluate_sample(model, processor, audio_path, reference, device)
+            result = evaluate_sample(model, processor, audio_path, reference, device, language=language)
             results.append(result)
 
             if (idx + 1) % 10 == 0:
@@ -374,6 +388,11 @@ def main():
     parser.add_argument("--max-samples", type=int, help="Maximum samples to evaluate")
     parser.add_argument("--output", help="Output path for results JSON")
     parser.add_argument("--device", default="cuda", help="Device (cuda/cpu)")
+    parser.add_argument("--lora", action="store_true", help="Load model as LoRA adapter")
+    parser.add_argument("--base-model", default="openai/whisper-small",
+                        help="Base model when using --lora (default: openai/whisper-small)")
+    parser.add_argument("--language", default=None, choices=["en", "hi"],
+                        help="Language for forced decoding (en/hi)")
 
     args = parser.parse_args()
 
@@ -382,8 +401,16 @@ def main():
         import torch
         from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
-        processor = WhisperProcessor.from_pretrained(args.model_path)
-        model = WhisperForConditionalGeneration.from_pretrained(args.model_path)
+        if args.lora:
+            from peft import PeftModel
+            logger.info(f"Loading base model: {args.base_model}")
+            base = WhisperForConditionalGeneration.from_pretrained(args.base_model)
+            logger.info(f"Loading LoRA adapter: {args.model_path}")
+            model = PeftModel.from_pretrained(base, args.model_path)
+            processor = WhisperProcessor.from_pretrained(args.model_path)
+        else:
+            processor = WhisperProcessor.from_pretrained(args.model_path)
+            model = WhisperForConditionalGeneration.from_pretrained(args.model_path)
 
         device = args.device if torch.cuda.is_available() else "cpu"
         model = model.to(device)
@@ -398,7 +425,8 @@ def main():
 
     # Evaluate
     results, summary = evaluate_test_set(
-        model, processor, Path(args.test_set), device, args.max_samples
+        model, processor, Path(args.test_set), device, args.max_samples,
+        language=args.language,
     )
 
     # Print report
