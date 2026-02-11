@@ -40,3 +40,9 @@ frontend/.vite/
 
 # Model files
 whisper-stt-model-29-1-2026/
+
+# Model evaluation results
+results_en_baseline.json
+results_en_lora.json
+results_hi_baseline.json
+results_hi_lora.json
