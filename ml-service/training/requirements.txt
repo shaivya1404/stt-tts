@@ -15,14 +15,14 @@ accelerate>=0.24.0
 peft>=0.5.0
 
 # TTS Training (XTTS)
-TTS>=0.22.0
+TTS
 
 # STT Training (Whisper)
 openai-whisper>=20231117
 
 # Evaluation
 jiwer>=3.0.0
-speechmos>=0.1.0
+speechmos
 resemblyzer>=0.1.0
 
 # Indic Language Support
@@ -37,7 +37,7 @@ deepmultilingualpunctuation>=1.0.0
 loguru>=0.7.2
 tqdm>=4.66.0
 pyyaml>=6.0.0
-pandas>=2.0.0
+pandas
 
 # Colab/Jupyter
 ipywidgets>=8.0.0

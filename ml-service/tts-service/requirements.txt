@@ -17,7 +17,7 @@ indic-nlp-library>=0.81
 aksharamukha>=2.0.0
 
 # Quality Estimation
-speechmos>=0.1.0
+speechmos
 
 # Speaker Encoder
 resemblyzer>=0.1.0
