@@ -16,7 +16,7 @@ venv/
 .env
 .env.*
 
-# data files
+# Data files
 data/
 
 # Logs
@@ -38,5 +38,5 @@ frontend/.vite/
 # Docker
 *.pid
 
-
+# Model files
 whisper-stt-model-29-1-2026/
