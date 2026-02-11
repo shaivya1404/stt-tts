@@ -4,4 +4,35 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "accelerate>=0.24.0",
+    "aksharamukha>=2.0.0",
+    "datasets>=2.16.0",
+    "deepfilternet>=0.5.0",
+    "deepmultilingualpunctuation>=1.0.0",
+    "fastapi[all]==0.110.0",
+    "faster-whisper>=1.0.0",
+    "indic-nlp-library>=0.81",
+    "ipywidgets>=8.0.0",
+    "jiwer>=3.0.0",
+    "librosa>=0.10.0",
+    "loguru==0.7.2",
+    "matplotlib>=3.7.0",
+    "numpy>=1.24.0",
+    "openai-whisper>=20231117",
+    "pandas>=1.5.3",
+    "peft>=0.5.0",
+    "pydantic==2.5.3",
+    "pydantic-settings==2.1.0",
+    "python-multipart==0.0.9",
+    "pyyaml>=6.0.0",
+    "resemblyzer>=0.1.0",
+    "scipy>=1.10.0",
+    "soundfile>=0.12.0",
+    "speechmos>=0.0.1.1",
+    "torch>=2.0.0",
+    "tqdm>=4.66.0",
+    "transformers>=4.36.0",
+    "tts>=0.22.0",
+    "uvicorn[standard]==0.27.1",
+]
